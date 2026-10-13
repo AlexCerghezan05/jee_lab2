@@ -1,54 +1,61 @@
+import org.example.Student;
+
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.stream.IntStream;
+import java.util.stream.Collectors;
 
-public class Main{
-    public static void main(String[] args){
-        List<Integer> x = new ArrayList<>();
-        List<Integer> y = new ArrayList<>();
-        List<Integer> xPlusY = new ArrayList<>();  //a
-        Set<Integer> zSet = new TreeSet<>();       //b
-        List<Integer> xMinusY = new ArrayList<>();     //c
-        int p=4;
-        List<Integer> xPlusYLimitedByp= new ArrayList<>();   //d
+public class Main {
+    public static void main(String[] args) {
+        List<Student> studenti = new ArrayList<>();
+        studenti.add(new Student("Popescu", "Marian", "225_3"));
+        studenti.add(new Student("Popescu", "Maria", "225_3"));
+        studenti.add(new Student("Popa", "Marian", "225_3"));
+        studenti.add(new Student("Bica", "Irina", "225_3"));
+        studenti.add(new Student("Badea", "Ion", "225_1"));
+        studenti.add(new Student("Cacoveanu", "Andreea", "225_1"));
+        studenti.add(new Student("Onofrei", "Mircea", "225_1"));
 
-        Random rand= new Random();
-        IntStream.range(0,5).forEach(i -> x.add(rand.nextInt(11)));
-        IntStream.range(0,7).forEach(i -> y.add(rand.nextInt(11)));
-
-        Collections.sort(x);
-        Collections.sort(y);
-
-        System.out.println("Lista x este: " + x);
-        System.out.println("Lista y este: " + y);
+        Random rand = new Random();
 
         // a)
-        xPlusY.addAll(x);
-        xPlusY.addAll(y);
-        Collections.sort(xPlusY);
-        System.out.println("a) xPlusY este: " + xPlusY);
-
-        //b)
-        zSet.addAll(x);
-        zSet.retainAll(y);
-        System.out.println("b) zSet este: "+ zSet);
-
-        //c)
-        xMinusY.addAll(x);
-        xMinusY.removeAll(y);
-        System.out.println("c) xMinusY este: " + xMinusY);
-
-        //d)
-        for(int valoare : xPlusY){
-            if( valoare<=p){
-                xPlusYLimitedByp.add(valoare);
+        for (Student s : studenti) {
+            for (int i = 0; i < 5; i++) {
+                s.adaugaNota(rand.nextInt(7) + 4);
             }
         }
-        System.out.println("d) xPlusYLimitedByp este: "+ xPlusYLimitedByp);
 
+        // b1) Afișare alfabetica, pe grupe
+        studenti.sort(Comparator.comparing(Student::getGrupa)
+                .thenComparing(Student::getNume)
+                .thenComparing(Student::getPrenume));
+
+        System.out.println(" Studenti ordonati (Grupa, Nume, Prenume) ");
+        for (Student s : studenti) {
+            System.out.println(s);
+        }
+
+        // b2) Descrescător după medii - pentru integraliști
+        List<Student> integralisti = studenti.stream()
+                .filter(Student::esteIntegralist)
+                .sorted((s1, s2) -> Double.compare(s2.medie(), s1.medie()))
+                .collect(Collectors.toList());
+
+        System.out.println(" Integralisti (Medie descrescator) ");
+        for (Student s : integralisti) {
+            System.out.println(s);
+        }
+
+        // b3) Crescător după numărul de restanțe - pentru restanțieri
+        List<Student> restantieri = studenti.stream()
+                .filter(s -> !s.esteIntegralist())
+                .sorted(Comparator.comparingInt(Student::numarRestante))
+                .collect(Collectors.toList());
+
+        System.out.println(" Restantieri (Numar restante crescator) ");
+        for (Student s : restantieri) {
+            System.out.println(s);
+        }
     }
 }
